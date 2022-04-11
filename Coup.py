@@ -19,7 +19,7 @@ class Card:
 class Coup:
     def __init__(self, players, inquisitor, ambassador, contessa, player_list):
         self.player_num = players
-        self.turn = 1
+        self.turn = 0
         self.cards = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]
         # checking custom game rules
         if inquisitor == "y":
@@ -54,3 +54,35 @@ class Coup:
         card = choice(self.cards)
         self.cards.remove(card)
         return card
+
+    def next_turn(self):
+        self.turn += 1
+        if self.turn == self.player_num:
+            self.turn = 0
+        # checking if any player has 0 health left and removing them
+        for i, player in enumerate(self.players):
+            if player.health == 0:
+                self.player_num -= 1
+                self.players.pop(i)
+
+                # if one player remains, they win
+                if len(self.players) == 1:
+                    self.winner(self.players[0])
+
+    def income(self):
+        self.players[self.turn].coins += 1
+
+    # searches for the coin balance of a given player and returns it
+    def get_balance(self, player_id):
+        for i in self.players:
+            if i.id == str(player_id):
+                return i.coins
+
+    # ensures a player can only take action on their own turn
+    def check_turn(self, player_id) -> bool:
+        if self.players[self.turn].id == str(player_id):
+            return True
+        return False
+
+    def winner(self, player: Player):
+        pass
